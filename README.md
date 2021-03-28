@@ -59,12 +59,21 @@ Instalar el motor de base de datos [PostgreSQL](https://www.postgresql.org/downl
 ## Creación del proyecto
 
 Mediante el instalador de Laravel, vamos a crear un nuevo proyecto. Para ello, abrir una consola en la carpeta donde queremos alojar el directorio del proyecto y ejecutar:
-```bash
-laravel new my-application --git
+```
+laravel new crud-app-example --git
 ```
 
-Esperamos a que finalice, y como resultado se creará una nueva carpeta con el nombre "my-application" que contendrá los archivos del proyecto. Dado que estamos indicando el modificador --git, se inicializará además un repositorio git en el que podremos agregar un remote con Github o cualquier otro servicio de elección.
+Esperamos a que finalice, y como resultado se creará una nueva carpeta con el nombre "crud-app-example" que contendrá los archivos del proyecto. Dado que estamos indicando el modificador --git, se inicializará además un repositorio git en el que podremos agregar un remote con Github o cualquier otro servicio de elección.
 
+### Estructura básica del proyecto
+
+La estructura básica del proyecto generado contiene una vista inicial de bienvenida con algunos enlaces útiles de la documentación del framework. Para accederlo, es necesario ejecutar el servidor de desarrollo de Laravel mediante el comando
+
+```
+php artisan serve
+```
+
+Con esto, quedará ejecutándose la aplicación creada en el puerto 8000 de nuestro host, accesible desde http://localhost:8000.
 
 ### Configuración de archivo de ambiente
 
@@ -72,16 +81,22 @@ El archivo `.env` nos permite definir configuraciones que podrán luego ser leí
 
 Es importante que **este archivo no sea subido al repositorio**, dado que puede contener credenciales u otro tipo de información sensible. 
 
-Sin embargo, es buena práctica incluir un archivo denominado `.env.example` que permita indicar qué variables deben configurarse para poder hacer uso de la aplicación.
+Sin embargo, es buena práctica incluir un archivo denominado `.env.example` que permita indicar qué variables deben configurarse para poder hacer uso de la aplicación, tal como el que se encuentra en este repositorio.
 
 #### Acceso a base de datos
 
-Dentro del archivo `.env` debemos configurar los datos adecuados para la base de datos creada previamente (host, password, nombre de base de datos, etc.). Dado que utilizamos PostgreSQL, debemos incluir el campo DB_CONNECTION=pgsql. El resto de los datos, dependen de la instancia de base de datos que estemos utilizando. 
+Dentro del archivo `.env` **debemos configurar los datos adecuados para la base de datos creada previamente** (host, password, nombre de base de datos, etc.). Dado que utilizamos PostgreSQL, debemos incluir el campo DB_CONNECTION=pgsql. El resto de los datos dependen de la instancia de base de datos que estemos utilizando. Los nombres de las propiedades son los que se encuentran en el archivo de ejemplo, bajo la sección "Database config section". 
 
-## Módulo de usuarios con Laravel Breeze
+##### Verificando el acceso
+
+Laravel, al igual que otros frameworks, incorpora el concepto de *migraciones* con la idea de poder definir, mediante alguna sintaxis que se mapee a SQL, la estructura que tendrán las tablas de la base de datos. Luego de configurar el archivo `.env` con las credenciales de la base de datos, probamos ejecutar las migraciones con el comando
+
+```
+php artisan migrate
+```
 
 
-### Ejecución de migraciones
+## Starter Kit: Laravel Breeze
 
-Laravel, al igual que otros frameworks, incorpora el concepto de *migraciones*. La idea es poder definir, mediante alguna syntaxis, la estructura que tendrán las tablas de la base de datos.
-Ejecutar php artisan migrate con una terminal en la raiz del proyecto, y observar la salida por consola anunciando creación exitosa de las tablas. 
+Laravel Breeze es una implementación de las funcionalidades básicas de autenticación de Laravel, incluyendo tanto la lógica como las vistas para el ingreso de datos.  
+
