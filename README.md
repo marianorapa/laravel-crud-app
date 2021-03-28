@@ -1,5 +1,7 @@
 # Ejemplo de aplicación CRUD con PHP + Laravel
 
+El objetivo de este repositorio es dar una breve introducción a la configuración necesaria para desarrollar un proyecto con el framework Laravel y llevar a cabo un CRUD (Create, Read, Update, Delete) de una entidad. 
+
 ## Configuraciones previas
 
 Para poder desarrollar bajo este framework tenemos varias opciones. La que utilizaremos involucra la instalación de:
@@ -87,16 +89,39 @@ Sin embargo, es buena práctica incluir un archivo denominado `.env.example` que
 
 Dentro del archivo `.env` **debemos configurar los datos adecuados para la base de datos creada previamente** (host, password, nombre de base de datos, etc.). Dado que utilizamos PostgreSQL, debemos incluir el campo DB_CONNECTION=pgsql. El resto de los datos dependen de la instancia de base de datos que estemos utilizando. Los nombres de las propiedades son los que se encuentran en el archivo de ejemplo, bajo la sección "Database config section". 
 
-##### Verificando el acceso
+#### Migraciones de la base de datos
 
-Laravel, al igual que otros frameworks, incorpora el concepto de *migraciones* con la idea de poder definir, mediante alguna sintaxis que se mapee a SQL, la estructura que tendrán las tablas de la base de datos. Luego de configurar el archivo `.env` con las credenciales de la base de datos, probamos ejecutar las migraciones con el comando
+Laravel, al igual que otros frameworks, **incorpora el concepto de *migraciones*** con la idea de poder definir, mediante alguna sintaxis que se mapee a SQL, **la estructura que tendrán las tablas de la base de datos**. Dentro de `/database/migrations` encontramos 3 clases que heredan de Migration. 
+Para ver el impacto que tienen sobre la base de datos, luego de configurar el archivo `.env` con las credenciales adecuadas, ejecutamos 
 
 ```
 php artisan migrate
 ```
 
+Si la salida fue exitosa, dentro de la base de datos se habrán creado las 3 tablas con los atributos especificados en las migraciones. 
+
 
 ## Starter Kit: Laravel Breeze
 
-Laravel Breeze es una implementación de las funcionalidades básicas de autenticación de Laravel, incluyendo tanto la lógica como las vistas para el ingreso de datos.  
+Laravel Breeze es una implementación de las funcionalidades básicas de autenticación de Laravel, incluyendo tanto la lógica como las vistas para el ingreso de datos. Se trata de un *starter kit* que podemos incorporar al proyecto, mediante
+
+```
+composer require laravel/breeze --dev
+```
+
+Luego, ejecutamos
+
+```
+php artisan breeze:install
+
+npm install
+
+npm run dev
+
+php artisan migrate
+```
+
+y volvemos a ejecutar el proyecto mediante `php artisan serve`.
+
+Para comprobar la correcta instalación, navegamos a la ruta `/register`, completamos los datos y nos registramos en la aplicación.
 
