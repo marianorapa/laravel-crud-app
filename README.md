@@ -18,7 +18,7 @@ Se puede utilizar XAMPP pero debido a que es posible que existan errores con la 
 
 Para verificar la correcta instalación, ejecutar en una nueva terminal el comando `php -v`. Si todo ha salido bien, veremos como salida la versión de PHP instalada.
 
-NOTA ACLARATORIA:
+####  NOTA ACLARATORIA:
 Si tienen linux, instalarlo a través de apt:
 ``` bash
 $ sudo apt install php -y
@@ -41,7 +41,11 @@ Abrimos el archivo con un editor de texto y descomentamos (quitando el ";" del c
 
 Desde luego, si algunas o todas se encuentran habilitadas, mantenerlas de ese modo.
 
-
+####  NOTA ACLARATORIA:
+Si tienen linux:
+``` bash
+sudo nano /etc/php/7.4/cli/php.ini
+```
 [Completar con links a la doc y comandos para crear un proyecto de cero.]
 
 
@@ -49,9 +53,19 @@ Desde luego, si algunas o todas se encuentran habilitadas, mantenerlas de ese mo
 
 Composer es un gestor de dependencias para PHP con el que instalaremos Laravel. Lo descargamos desde su [página oficial](https://getcomposer.org/download/). Por defecto, los instaladores configuran el PATH para poder utilizar Composer desde cualquier CLI. Lo verificamos mediante el comando `composer --version`.
 
+NOTA ACLARATORIA:
+Si estás con linux, seguí este tutorial:
+
+ 
+ sudo apt install php7.4-xml
+
+ 
+
+
+
 ### Laravel
 
-Dado que ya contamos con Composer, podemos instalar el instalador de Laravel como una dependencia global de Composer, ejecutando:
+Dado que ya contamos con Composer, podemos descargar el instalador de Laravel como una dependencia global de Composer, ejecutando:
 
 ```bash
 composer global require laravel/installer
@@ -63,6 +77,8 @@ Para comprobar su instalación, ejecutar en una terminal el comando `laravel --v
 
 Instalar el motor de base de datos [PostgreSQL](https://www.postgresql.org/download/), y crear una base de datos para el proyecto desde algún cliente. 
 
+UBUNTU INSTALL:
+https://www.postgresql.org/download/linux/ubuntu/
 
 ## Creación del proyecto
 
