@@ -18,6 +18,12 @@ Se puede utilizar XAMPP pero debido a que es posible que existan errores con la 
 
 Para verificar la correcta instalación, ejecutar en una nueva terminal el comando `php -v`. Si todo ha salido bien, veremos como salida la versión de PHP instalada.
 
+NOTA ACLARATORIA:
+Si tienen linux, instalarlo a través de apt:
+``` bash
+$ sudo apt install php -y
+```
+
 #### Configuración adicional
 
 Será necesario utilizar ciertas extensiones de PHP para poder conectarnos con PostgreSQL, hacer uso de las migraciones ofrecidas por el framework y servir la aplicación en entorno de desarrollo.
