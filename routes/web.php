@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,4 +28,4 @@ Route::get('/products/create', function () {
     return view('products.create');
 })->middleware('auth')->name('products.create');
 
-Route::post('/products', [ProductsController::class, 'store'])->middleware('auth')->name('products.store');
+Route::post('/products', [ProductController::class, 'store'])->middleware('auth')->name('products.store');
