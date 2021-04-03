@@ -31,18 +31,20 @@ class ProductController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         // Validate the given product
         $validated = $request-> validate([
-            'name' => 'required|alpha|unique:products|max:255',
+            'name' => 'required|unique:products|max:255',
             'price' => 'required|numeric|min:0'
         ]);
-        
-        // Store it 
+
+        // Store it
         Product::create($validated);
+
+        return view('dashboard');
     }
 
     /**
