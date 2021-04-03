@@ -204,7 +204,23 @@ un idioma agregarían 'es' en lugar de 's'.*
 
 ##### Definición de los atributos de la entidad
 
-[Completar con la definición de la migration <-----------------------------]() 
+PHP no requiere la definición explícita de los campos de una clase; sin embargo, para poder persistir los valores en la base de datos, necesitamos que la tabla los incluya. Dado que estamos utilizando las migraciones ofrecidas por el framework, modificamos el archivo generado en el paso previo dentro de la carpeta `database/migrations`, agregando en su método `up()` la siguiente definición:
+```php
+ Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->decimal('price', $precision = 8, $scale=2);
+            $table->timestamps();
+        });
+```
+
+Dentro del método definimos los atributos de la tabla mediante los métodos `id()`, `string()`, `decimal()` y `timestamps()`. El primero de ellos genera un campo autoincremental como clave primaria, el segundo define la columna `producto` de tipo `VARCHAR`, la tercera el campo `price` como `DECIMAL` con la precisión indicada, y el último genera los campos `created_at` y `updated_at` de tipo `TIMESTAMP` con la fecha y hora de creación y actualización, respectivamente. 
+
+Para ver impactada la entidad en la base de datos, ejecutamos nuevamente:
+
+```shell
+php artisan migrate
+```
 
 #### Envío de datos al servidor
 
@@ -271,15 +287,53 @@ Por el momento, sin embargo, solo nos interesa el método `store(Request $reques
 
 ###### Validación de la request
 
-[Explicar validación sencilla en controller]
+Dentro del método `store(Request $request)` del `ProductController`, podemos acceder a los atributos enviados desde la vista agrupados dentro de la Request. Laravel nos provee, además, el método *helper* `validate()` para llevar a cabo una validación sobre los campos recibidos:
 
+```php
+   $validated = $request-> validate([
+        'name' => 'required|alpha|unique:products|max:255',
+        'price' => 'required|numeric|min:0'
+    ]);
+```
+Con las reglas utilizadas, **la solicitud no avanzará frente a alguna de las siguientes condiciones**:
+- El campo `name` o `price` no está en el *body* de la *request*.
+- El campo `name` ya existe en la tabla `products` de la base de datos, supera un largo de 255 caracteres, o no está compuesto solamente de letras.
+- El campo `price` no es numérico o el valor es menor a 0.
+
+Frente al fallo en alguna de las validaciones, **Laravel interrumpe el avance de la *request*, redirigiendo al usuario a la ubicación previa**. Desde la vista que reciba al usuario, podemos acceder a los errores (si hubiera alguno) con la variable `$errors`:
+
+```
+@if ($errors->any())
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded relative" role="alert">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif  
+
+```
+Mediante la directiva `@if` podemos verificar si hay errores, y en ese caso renderizar el fragmento comprendido hasta el `@endif`.
 
 Para lógicas más extensas de validación, Laravel ofrece la posibilidad de clases que abstraigan la request y ejecuten las 
 reglas correspondientes. Se recomienda leer [la documentación del framework al respecto](https://laravel.com/docs/8.x/validation#form-request-validation).
 
 ###### Persistencia de la entidad recibida
 
+Para guardar los datos del producto, una vez validados, utilizamos el ORM incorporado en Laravel: Eloquent. Para más información al respecto, dirigirse a [la documentación](https://laravel.com/docs/8.x/eloquent).
 
+Luego de la validación, agregamos:
+
+```php
+Product::create($validated);
+```
+
+Para que esto funcione, es necesario que el modelo `App/Model/Product` defina los atributos "asignables en masa", de la siguiente forma:
+
+```php
+protected $fillable = ['name', 'price'];
+```
 
 ### Consulta de productos
 
