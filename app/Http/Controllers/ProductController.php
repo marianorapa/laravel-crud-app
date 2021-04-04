@@ -10,11 +10,14 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
     public function index()
     {
-        //
+        // Retrieve all products and send them to view
+        $products = Product::all();
+
+        return view('products.index')->with('products', $products);
     }
 
     /**
@@ -44,7 +47,7 @@ class ProductController extends Controller
         // Store it
         Product::create($validated);
 
-        return view('dashboard');
+        return redirect()->route('products.index');
     }
 
     /**
