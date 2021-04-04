@@ -232,6 +232,39 @@ un `<form>` con los `<input>`s necesarios para el envío de los datos.
 Para presentarle el formulario al usuario, creamos el archivo `create.blade.php` en la carpeta `resources/views/products`
 (bajo este directorio, por convención, podemos agrupar todas las vistas relacionadas con los productos) con el HTML correspondiente. 
 
+```blade
+ <div class="py-12">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 bg-white border-b border-gray-200">
+                    <form method="POST" action="{{route('products.store')}}">
+                        @csrf
+                        <div>
+                            <x-label for="name" :value="__('Nombre')" />
+
+                            <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
+                        </div>
+
+                        <div class="mt-4 grid grid-flow-col grid-rows-1 grid-cols-2">
+                            <div>
+                                <x-label for="price" :value="__('Precio')" />
+
+                                <span>$ </span><x-input id="price" class="mt-1 w-20" type="number" name="price" :value="old('price')" required />
+                            </div>
+                            <div class="my-auto">
+                                <x-button class="ml-3 float-right">
+                                    {{ __('Guardar producto') }}
+                                </x-button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+```
+Además del HTML necesario, se incluyen las clases de Tailwind para formatear la vista. Se recomienda poner el foco en el `<form>`, su `action` y los campos. Los *tags* que no pertenecen a la especificación de HTML, se tratan de [componentes de Blade](https://laravel.com/docs/8.x/blade#components). 
+
 **Importante**: dentro del `<form>` está la directiva de Blade `@csrf`. Esta es fundamental para que podamos procesar el 
 formulario cuando se envíen los datos a nuestra aplicación. Más información en la [documentación](https://laravel.com/docs/8.x/csrf).
 
@@ -291,18 +324,18 @@ Dentro del método `store(Request $request)` del `ProductController`, podemos ac
 
 ```php
    $validated = $request-> validate([
-        'name' => 'required|alpha|unique:products|max:255',
+        'name' => 'required|unique:products|max:255',
         'price' => 'required|numeric|min:0'
     ]);
 ```
 Con las reglas utilizadas, **la solicitud no avanzará frente a alguna de las siguientes condiciones**:
 - El campo `name` o `price` no está en el *body* de la *request*.
-- El campo `name` ya existe en la tabla `products` de la base de datos, supera un largo de 255 caracteres, o no está compuesto solamente de letras.
+- El campo `name` ya existe en la tabla `products` de la base de datos o supera los 255 caracteres de largo.
 - El campo `price` no es numérico o el valor es menor a 0.
 
 Frente al fallo en alguna de las validaciones, **Laravel interrumpe el avance de la *request*, redirigiendo al usuario a la ubicación previa**. Desde la vista que reciba al usuario, podemos acceder a los errores (si hubiera alguno) con la variable `$errors`:
 
-```
+```blade
 @if ($errors->any())
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded relative" role="alert">
         <ul>
@@ -337,6 +370,124 @@ protected $fillable = ['name', 'price'];
 
 ### Consulta de productos
 
+Para poder confirmar que se haya registrado exitosamente el producto, agreguemos la posibilidad de acceder al listado de todos los productos.
+
+#### Creación de la ruta
+
+Dentro del archivo de rutas, agregamos:
+
+```php
+Route::get('/products', [ProductController::class, 'index'])->middleware('auth')->name('products.index');
+```
+Es decir, que frente a un GET a `/products`, se ejecutará el método `index()` del `ProductController`.
+
+
+***Importante**: si bien podría parecer un error que "colisione" esta ruta con la definida previamente, debemos tener en cuenta el método HTTP utilizado en cada una. Dado que en esta definimos un GET y en la anterior un POST, es perfectamente válido (y si lo trasladamos a REST, buena práctica) que ambas refieran a `/products`.*
+
+
+#### Lógica en el controlador
+
+En el método `index()` del controlador, recuperamos todos los productos y los entregamos a una nueva vista:
+
+```php
+// Retrieve all products and send them to view
+$products = Product::all();
+
+return view('products.index')->with('products', $products);
+```
+
+Eloquent nos ofrece el método `all()` para recuperar todos los objetos almacenados. Luego, mediante el *helper* `with()` agregamos los productos a la vista `products.index`.
+
+
+#### Vista del listado
+
+En el punto anterior llamamos a la vista `products.index` que hasta el momento no existía. Vamos a crearla en el mismo directorio y con la misma lógica de nomenclatura que la de creación de productos: `resources/views/products/index.blade.php`. Dentro de ella, podemos acceder a la variable `$products` que nos envió el controlador. Con la directiva `@foreach($value in <variable>)`, Blade nos permite iterar sobre un arreglo.
+
+Agregando algunas clases de Tailwind, nos queda:
+
+
+```blade
+<div class="py-12">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            @foreach ($products as $product)
+                    <div class="flex flex-col">
+                        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Nombre
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Precio
+                                            </th>
+                                            <th scope="col" class="relative px-6 py-3">
+                                                <span class="sr-only">Editar</span>
+                                            </th>
+                                            <th scope="col" class="relative px-6 py-3">
+                                                <span class="sr-only">Eliminar</span>
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                        <img class="h-10 w-10 rounded-full" src="https://picsum.photos/seed/picsum/200/300" alt="">
+                                                    </div>
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-900 w-40">
+                                                            {{$product->name}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                  ${{$product->price}}
+                                                </span>
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <a href="#" class="text-indigo-600 hover:text-indigo-900">Editar</a>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <a href="#" class="text-red-600 hover:text-red-900">Eliminar</a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+        </div>
+    </div>
+```
+
+Es importante notar que, en cada iteración, podemos acceder a los atributos del producto mediante `$product->field_name`. Si el objeto tuviese otro asociado, también podríamos acceder a él, a sus atributos o incluso métodos, como comúnmente lo hacemos en POO. 
+
+*Aclaración: se agregaron los enlaces de 'Editar' y 'Eliminar' para los pasos posteriores, pero aún no se utilizan.*
+
+#### Acomodado general
+
+Al completar los pasos previos ya hemos logrado acceder a todos los productos. Ahora, al terminar de guardar un producto, sería deseable redirigir a los usuarios al listado que construimos. En el método `store()` del controlador, utilizamos el *helper* de redirección en lugar del `return` previo:
+
+```php
+ /* Previous product saving... */
+ 
+ return redirect()->route('products.index');
+ 
+```
+
+Luego, en la barra de navegación, cambiamos el enlace de `Productos` a la vista del listado:
+
+```blade
+<!-- other links -->
+<x-nav-link :href="route('products.index')" :active="request()->routeIs('products.index')">
+```
 
 
 ### Actualización de un producto
