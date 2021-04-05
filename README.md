@@ -53,7 +53,6 @@ Si tienen linux:
 ``` bash
 sudo nano /etc/php/7.4/cli/php.ini
 ```
-[Completar con links a la doc y comandos para crear un proyecto de cero.]
 
 
 ### Composer
@@ -154,13 +153,13 @@ las migraciones.
 Laravel Breeze es una implementación de las funcionalidades básicas de autenticación de Laravel, incluyendo tanto la
 lógica como las vistas para el ingreso de datos. Se trata de un *starter kit* que podemos incorporar al proyecto, mediante
 
-```
+```shell
 composer require laravel/breeze --dev
 ```
 
 Luego, ejecutamos
 
-```
+```shell
 php artisan breeze:install
 
 npm install
@@ -471,7 +470,7 @@ Es importante notar que, en cada iteración, podemos acceder a los atributos del
 
 *Aclaración: se agregaron los enlaces de 'Editar' y 'Eliminar' para los pasos posteriores, pero aún no se utilizan.*
 
-#### Acomodado general
+#### Acomodo general
 
 Al completar los pasos previos ya hemos logrado acceder a todos los productos. Ahora, al terminar de guardar un producto, sería deseable redirigir a los usuarios al listado que construimos. En el método `store()` del controlador, utilizamos el *helper* de redirección en lugar del `return` previo:
 
@@ -491,6 +490,24 @@ Luego, en la barra de navegación, cambiamos el enlace de `Productos` a la vista
 
 
 ### Actualización de un producto
+
+Para la actualización crearemos la vista con los datos del producto almacenado, permitiendo al usuario que los modifique. A su vez, los cambios que realice serán persistidos a la base de datos.
+
+#### Agregando las rutas
+
+Agregamos dos rutas: una para obtener el formulario de actualización, y la otra para recibir los datos del producto actualizado.
+
+```php
+Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->middleware('auth')->name('products.edit');
+
+Route::put('/products/{product}', [ProductController::class, 'update'])->middleware('auth')->name('products.update');
+
+```
+En ambos casos, utilizamos una variable en el path que nos permite capturar el producto afectado. mediante `{}`.
+
+#### Creación de la vista
+
+Creamos una vista en la carpeta `resources/views/products` con el nombre `edit.blade.php`, que muestre el formulario con los datos de un producto como variable `$product`, y que al enviarse invoque la ruta `products.update`.
 
 
 ### Eliminación de un producto
