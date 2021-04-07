@@ -503,11 +503,59 @@ Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->midd
 Route::put('/products/{product}', [ProductController::class, 'update'])->middleware('auth')->name('products.update');
 
 ```
-En ambos casos, utilizamos una variable en el path que nos permite capturar el producto afectado. mediante `{}`.
+En ambos casos, utilizamos una variable en el path que nos permite capturar el producto afectado mediante `{}` con la variable entre medio.
+
+En la segunda ruta utilizamos un `put` dado que es en ella donde estamos ejecutando la acción concreta de actualizado.
+
+#### Generando los enlaces 
+
+[Completar con generación de enlaces en índice]
+
 
 #### Creación de la vista
 
-Creamos una vista en la carpeta `resources/views/products` con el nombre `edit.blade.php`, que muestre el formulario con los datos de un producto como variable `$product`, y que al enviarse invoque la ruta `products.update`.
+Creamos una vista en la carpeta `resources/views/products` con el nombre `edit.blade.php`, que muestre el formulario con los datos de un producto como variable `$product`, y que al hacer _submit_ invoque la ruta `products.update`.
+
+```blade 
+ <form method="POST" action="{{route('products.update', $product)}}">
+    @csrf
+    @method('PUT')
+    <div>
+        <x-label for="name" :value="__('Nombre')" />
+
+        <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name') ?? $product->name" required autofocus />
+    </div>
+
+    <div class="mt-4 grid grid-flow-col grid-rows-1 grid-cols-2">
+        <div>
+            <x-label for="price" :value="__('Precio')" />
+
+            <span>$ </span><x-input id="price" class="mt-1 w-24" type="number" name="price" :value="old('price') ?? $product->price" required />
+        </div>
+        <div class="my-auto">
+            <x-button class="ml-3 float-right">
+                {{ __('Actualizar producto') }}
+            </x-button>
+        </div>
+    </div>
+</form>
+```
+Dentro del `<form>`, además de la directiva `@csrf`, incluimos `@method('put')`. Esto se debe a que el formulario especifica el método `POST`, pero a nosotros nos interesa enviar los datos como un `PUT`. Mediante esta directiva, Blade agrega un campo _hidden_ con el valor pasado como parámetro, logrando el efecto deseado. Más información en la [documentación](https://laravel.com/docs/8.x/blade#method-field). 
+
+Veamos que los campos del formulario son los mismos que los utilizados para la creación de un producto, pero dentro del valor inicial - el atributo `:value` del `<x-input>`- estamos indicamos que frente a la existencia de un valor para el campo `name` se utilice ese mismo, pero de no existir, el campo sea rellenado con el valor del producto pasado como variable, es decir, `$product`.
+
+
+#### Handles en el controlador
+
+Del lado del controlador, revisando las rutas que definimos, estamos utilizando los métodos `edit()` y `update()`. Dada la presencia de la variable en el path, estos métodos tendrán que recibir un parámetro. Sin embargo, dado que construimos el controlador con la bandera `--resource` y el modelo `Product`, estos métodos ya están definidos en nuestro `ProductController`, tomando un `Product` como parámetro.  
+
+Dentro del método `edit()`, simplemente necesitamos devolver la vista que construimos, entregando el producto recibido como parámetro:
+
+```php
+return view('products.edit')->with('product', $product);
+```
+
+[Completar con método update()]
 
 
 ### Eliminación de un producto
