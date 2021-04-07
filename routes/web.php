@@ -31,3 +31,7 @@ Route::get('/products/create', function () {
 Route::post('/products', [ProductController::class, 'store'])->middleware('auth')->name('products.store');
 
 Route::get('/products', [ProductController::class, 'index'])->middleware('auth')->name('products.index');
+
+Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->middleware('auth')->name('products.edit');
+
+Route::put('/products/{product}', [ProductController::class, 'update'])->middleware('auth')->name('products.update');

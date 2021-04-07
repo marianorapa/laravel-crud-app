@@ -50,7 +50,7 @@
                                                   ${{$product->price}}
                                                 </span>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a href="#" class="text-indigo-600 hover:text-indigo-900">Editar</a>
+                                                <a href="{{route('products.edit', $product->id)}}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <a href="#" class="text-red-600 hover:text-red-900">Eliminar</a>

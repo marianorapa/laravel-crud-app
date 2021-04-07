@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use function PhpParser\Node\Name;
 
 class ProductController extends Controller
 {
@@ -65,11 +67,12 @@ class ProductController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
     public function edit(Product $product)
     {
-        //
+        // Return the edit view with the given product
+        return view('products.edit')->with('product', $product);
     }
 
     /**
