@@ -9,6 +9,13 @@
 
     <div class="py-12">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+
+            @if (session('message'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-4 rounded relative" role="alert">
+                    {{session('message')}}
+                </div>
+            @endif
+
             @foreach ($products as $product)
                     <div class="flex flex-col">
                         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">

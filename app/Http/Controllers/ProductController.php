@@ -36,7 +36,7 @@ class ProductController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -49,7 +49,7 @@ class ProductController extends Controller
         // Store it
         Product::create($validated);
 
-        return redirect()->route('products.index');
+        return redirect()->route('products.index')->with('message', 'Producto creado!');
     }
 
     /**
@@ -80,11 +80,20 @@ class ProductController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function update(Request $request, Product $product)
     {
-        //
+        // Validate the user input
+        $validated = $request->validate([
+            'name' => 'required|max:255',
+            'price' => 'required|numeric|min:0'
+        ]);
+
+        // Update the product
+        $product->update($validated);
+
+        return redirect()->route('products.index')->with('message', 'Producto actualizado con éxito!');
     }
 
     /**
