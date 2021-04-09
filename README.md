@@ -507,10 +507,6 @@ En ambos casos, utilizamos una variable en el path que nos permite capturar el p
 
 En la segunda ruta utilizamos un `put` dado que es en ella donde estamos ejecutando la acción concreta de actualizado.
 
-#### Generando los enlaces 
-
-[Completar con generación de enlaces en índice]
-
 
 #### Creación de la vista
 
@@ -545,9 +541,25 @@ Dentro del `<form>`, además de la directiva `@csrf`, incluimos `@method('put')`
 Veamos que los campos del formulario son los mismos que los utilizados para la creación de un producto, pero dentro del valor inicial - el atributo `:value` del `<x-input>`- estamos indicamos que frente a la existencia de un valor para el campo `name` se utilice ese mismo, pero de no existir, el campo sea rellenado con el valor del producto pasado como variable, es decir, `$product`.
 
 
+#### Generando los enlaces 
+
+Para poder acceder a la vista que creamos, modificaremos `index.blade.php` para que al clickear en el botón Editar que incluimos previamente, el usuario sea redirigido al formulario de edición.
+
+Este punto parece trivial, pero es importante para entender **cómo renderizar un enlace de forma dinámica**. Lo vemos a continuación:
+
+```blade 
+...
+<a href="{{route('products.edit', $product->id)}}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
+...
+```
+Dentro del `href` de la etiqueta `<a>` del botón Editar de cada elemento (cada iteración del `@foreach`), utilizamos el *helper* `route()` como en otras oportunidades, pero pasando como segundo parámetro `$product->id`, de forma tal que la ruta `products.edit` reciba el id del producto que queremos modificar. 
+
+
 #### Handles en el controlador
 
 Del lado del controlador, revisando las rutas que definimos, estamos utilizando los métodos `edit()` y `update()`. Dada la presencia de la variable en el path, estos métodos tendrán que recibir un parámetro. Sin embargo, dado que construimos el controlador con la bandera `--resource` y el modelo `Product`, estos métodos ya están definidos en nuestro `ProductController`, tomando un `Product` como parámetro.  
+
+##### Método `edit()`
 
 Dentro del método `edit()`, simplemente necesitamos devolver la vista que construimos, entregando el producto recibido como parámetro:
 
@@ -555,7 +567,23 @@ Dentro del método `edit()`, simplemente necesitamos devolver la vista que const
 return view('products.edit')->with('product', $product);
 ```
 
-[Completar con método update()]
+##### Método `update()`
+
+Dentro del método `update()` vamos a validar (al igual que hicimos en el `create`) que los datos del producto sean correctos. Luego, actualizamos el producto con los nuevos valores en la base de datos. 
+
+```php
+// Validate the user input
+$validated = $request->validate([
+    'name' => 'required|max:255',
+    'price' => 'required|numeric|min:0'
+]);
+
+// Update the product
+$product->update($validated);
+
+return redirect()->route('products.index')->with('message', 'Producto actualizado con éxito!');
+```
+En esta oportunidad, al redirigir a la ruta `products.index`, agregamos un mensaje para mejorar la usabilidad de la aplicación. Del lado de la vista, será accedido mediante `session('message')`.
 
 
 ### Eliminación de un producto
